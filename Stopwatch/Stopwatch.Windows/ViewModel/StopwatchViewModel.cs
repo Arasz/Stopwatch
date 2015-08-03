@@ -22,46 +22,45 @@ namespace Stopwatch.ViewModel
         }
         #endregion
 
-        private int _ticksCounter; // Functionality not implemented
         private DispatcherTimer _timer;
-        private StopwatchModel _stopwatch;
+        private StopwatchModel _stopwatchModel;
+
+        public bool Running { get { return _stopwatchModel.Running; } }
 
         public int Hours
         {
             get
             {
-                if (_stopwatch.Running)
-                    return _stopwatch.Elapsed.Value.Hours;
-                else
-                    return 0;
+                return Running ? _stopwatchModel.Elapsed.Value.Hours : 0;
             }
         }
         public int Minutes
         {
             get
             {
-                if (_stopwatch.Running)
-                    return _stopwatch.Elapsed.Value.Minutes;
+                if (Running)
+                    return _stopwatchModel.Elapsed.Value.Minutes;
                 else
                     return 0;
             }
         }
-        public int Seconds
+        public decimal Seconds
         {
             get
             {
-                if (_stopwatch.Running)
-                    return _stopwatch.Elapsed.Value.Seconds;
+                if (Running)
+                    return (decimal)_stopwatchModel.Elapsed.Value.Seconds+
+                        (_stopwatchModel.Elapsed.Value.Milliseconds * .001M);
                 else
-                    return 0;
+                    return 0.0M;
             }
         }
         public int LapHours
         {
             get
             {
-                if (_stopwatch.Running)
-                    return _stopwatch.LapTime.Value.Hours;
+                if (Running)
+                    return _stopwatchModel.LapTime.Value.Hours;
                 else
                     return 0;
             }
@@ -70,82 +69,103 @@ namespace Stopwatch.ViewModel
         {
             get
             {
-                if (_stopwatch.Running)
-                    return _stopwatch.LapTime.Value.Minutes;
+                if (Running)
+                    return _stopwatchModel.LapTime.Value.Minutes;
                 else
                     return 0;
             }
         }
-        public int LapSeconds
+        public decimal LapSeconds
         {
             get
             {
-                if (_stopwatch.Running)
-                    return _stopwatch.LapTime.Value.Seconds;
+                if (Running)
+                    return (decimal)_stopwatchModel.LapTime.Value.Seconds +
+                        (_stopwatchModel.LapTime.Value.Milliseconds * .001M);
                 else
-                    return 0;
+                    return 0.0M;
             }
         }
 
         public void Start()
         {
-            _stopwatch.Start();
-            _timer.Start();
+            _stopwatchModel.Start();
         }
 
         public void Stop()
         {
-            _stopwatch.Stop();
-            _timer.Stop();
+            _stopwatchModel.Stop();
         }
 
         public void Reset()
         {
-            _stopwatch.Reset();
-            _timer.Stop();
-            TimeChanged();
-            LapChanged();
+            bool running = Running;
+            _stopwatchModel.Reset();
+            if (running)
+                Start();
         }
 
         public void Lap()
         {
-            _stopwatch.Lap();
-        }
-
-        private void LapChanged()
-        {
-            OnPropertyChanged("LapHours");
-            OnPropertyChanged("LapMinutes");
-            OnPropertyChanged("LapSeconds");
-        }
-
-        private void TimeChanged()
-        {
-            OnPropertyChanged("Hours");
-            OnPropertyChanged("Minutes");
-            OnPropertyChanged("Seconds");
+            if(Running)
+                _stopwatchModel.Lap();
         }
 
         public StopwatchViewModel()
         {
-            _stopwatch = new StopwatchModel();
-            _stopwatch.LapTimeUpdated += _stopwatch_LapTimeUpdated;
+            _stopwatchModel = new StopwatchModel();
+            _stopwatchModel.LapTimeUpdated += _stopwatch_LapTimeUpdated;
 
             _timer = new DispatcherTimer();
             _timer.Tick += _timer_Tick;
-            _timer.Interval = TimeSpan.FromMilliseconds(1000);
-
-            _ticksCounter = 0;
+            _timer.Interval = TimeSpan.FromMilliseconds(50);
+            _timer.Start();
         }
+
+        private int _lapLastHours;
+        private int _lapLastMinutes;
+        private decimal _lapLastSeconds;
 
         private void _stopwatch_LapTimeUpdated(object sender, LapEventArgs e)
         {
-            LapChanged();
+            if (_lapLastHours != LapHours)
+            {
+                _lapLastHours = LapHours;
+                OnPropertyChanged("LapHours");
+            }
+            if (_lapLastMinutes != LapMinutes)
+            {
+                _lapLastMinutes = LapMinutes;
+                OnPropertyChanged("LapMinutes");
+            }
+            if (_lapLastSeconds != LapSeconds)
+            {
+                _lapLastSeconds = LapSeconds;
+                OnPropertyChanged("LapSeconds");
+            }
         }
+
+        private int _lastHours;
+        private int _lastMinutes;
+        private decimal _lastSeconds;
 
         private void _timer_Tick(object sender, object e)
         {
-            TimeChanged();
+            if (_lastHours != Hours)
+            {
+                _lastHours = Hours;
+                OnPropertyChanged("Hours");
+            }
+            if (_lastMinutes != Minutes)
+            {
+                _lastMinutes = Minutes;
+                OnPropertyChanged("Minutes");
+            }
+            if (_lastSeconds != Seconds)
+            {
+                _lastSeconds = Seconds;
+                OnPropertyChanged("Seconds");
+            }
         }
     }
 }

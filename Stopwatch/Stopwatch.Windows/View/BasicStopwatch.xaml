@@ -6,35 +6,37 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400"
+    d:DesignHeight="100"
+    d:DesignWidth="100"
     xmlns:viewmodel="using:Stopwatch.ViewModel">
 
     <UserControl.Resources>
         <viewmodel:StopwatchViewModel x:Name="viewModel"/>
         <x:String x:Key="LapButtonText">Lap</x:String>
-        <x:String x:Key="MeasuredTimeText">Measured time:</x:String>
-        <x:String x:Key="LapTimeText">Lap time:</x:String>
+        <x:String x:Key="MeasuredTimeText">Measured time: </x:String>
+        <x:String x:Key="LapTimeText">Lap time: </x:String>
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ResourceKey=viewModel}">
         <StackPanel Orientation="Vertical">
-            <TextBlock>
+            <StackPanel Orientation="Vertical" Margin="5,10">
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}">
                 <Run Text="{StaticResource MeasuredTimeText}"/>
                 <Run Text="{Binding Hours}"/>
                 <Run>:</Run>
                 <Run Text="{Binding Minutes}"/>
                 <Run>:</Run>
                 <Run Text="{Binding Seconds}"/>
-            </TextBlock>
-            <TextBlock>
+                </TextBlock>
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}">
                 <Run Text="{StaticResource LapTimeText}"/>
                 <Run Text="{Binding LapHours}"/>
                 <Run>:</Run>
                 <Run Text="{Binding LapMinutes}"/>
                 <Run>:</Run>
                 <Run Text="{Binding LapSeconds}"/>
-            </TextBlock>
+                </TextBlock>
+            </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="StartButton" Click="StartButton_Click">Start</Button>
                 <Button x:Name="StopButton"  Click="StopButton_Click">Stop</Button>
