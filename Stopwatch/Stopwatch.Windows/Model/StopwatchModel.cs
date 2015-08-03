@@ -8,13 +8,26 @@ namespace Stopwatch.Model
 {
     class StopwatchModel
     {
+        #region Events
+        public event EventHandler<LapEventArgs> LapTimeUpdated;
+
+        private void OnLapTimeUpdated(TimeSpan? lapTime)
+        {
+            var lapTimeUpdated = LapTimeUpdated;
+            if (lapTimeUpdated != null)
+                lapTimeUpdated(this, new LapEventArgs(lapTime));
+        }
+        #endregion
+
+
+
         /// <summary>
         /// Time when stopwatch started work
         /// </summary>
         private DateTime? _started;
 
         /// <summary>
-        /// Last measured time span.
+        /// Last measured time span
         /// </summary>
         private TimeSpan? _previousElapsedTime;
 
@@ -22,6 +35,11 @@ namespace Stopwatch.Model
         /// Indicates that stopwatch is running
         /// </summary>
         public bool Running{ get { return _started.HasValue; } }
+
+        /// <summary>
+        /// Lap time
+        /// </summary>
+        public TimeSpan? LapTime { get; private set; }
 
         /// <summary>
         /// Total elapsed time 
@@ -78,6 +96,7 @@ namespace Stopwatch.Model
         {
             _previousElapsedTime = null;
             _started = null;
+            LapTime = null;
         }
 
         /// <summary>
@@ -86,6 +105,12 @@ namespace Stopwatch.Model
         public StopwatchModel()
         {
             Reset();
+        }
+
+        public void Lap()
+        {
+            LapTime = Elapsed;
+            OnLapTimeUpdated(LapTime);
         }
 
     }

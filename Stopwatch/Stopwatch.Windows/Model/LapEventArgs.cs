@@ -12,5 +12,10 @@ namespace Stopwatch.Model
         {
             get; private set;
         }
+
+        public LapEventArgs(TimeSpan? lapTime)
+        {
+            LapTime = lapTime;
+        }
     }
 }
