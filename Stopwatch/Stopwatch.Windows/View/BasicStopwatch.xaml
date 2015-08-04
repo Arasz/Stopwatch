@@ -12,9 +12,16 @@
 
     <UserControl.Resources>
         <viewmodel:StopwatchViewModel x:Name="viewModel"/>
+        <viewmodel:TimeNumberFormatConverter x:Name="timeNumberFormatConverter"/>
+        <viewmodel:BooleanNotConverter x:Name="notConverter"/>
+        <viewmodel:BooleanVisibilityConverter x:Name="visibilityConverter" />
         <x:String x:Key="LapButtonText">Lap</x:String>
         <x:String x:Key="MeasuredTimeText">Measured time: </x:String>
-        <x:String x:Key="LapTimeText">Lap time: </x:String>
+        <x:String x:Key="LapTimeText">Lap time:</x:String>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ResourceKey=viewModel}">
@@ -22,27 +29,35 @@
             <StackPanel Orientation="Vertical" Margin="5,10">
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}">
                 <Run Text="{StaticResource MeasuredTimeText}"/>
-                <Run Text="{Binding Hours}"/>
+                <Run Text="{Binding Hours, Converter={StaticResource timeNumberFormatConverter}}"/>
                 <Run>:</Run>
-                <Run Text="{Binding Minutes}"/>
+                <Run Text="{Binding Minutes, Converter={StaticResource timeNumberFormatConverter},
+                    ConverterParameter=d2}"/>
                 <Run>:</Run>
-                <Run Text="{Binding Seconds}"/>
+                <Run Text="{Binding Seconds, Converter={StaticResource timeNumberFormatConverter}}"/>
                 </TextBlock>
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}">
                 <Run Text="{StaticResource LapTimeText}"/>
-                <Run Text="{Binding LapHours}"/>
+                <Run Text="{Binding LapHours, Converter={StaticResource timeNumberFormatConverter}}"/>
                 <Run>:</Run>
-                <Run Text="{Binding LapMinutes}"/>
+                <Run Text="{Binding LapMinutes, Converter={StaticResource timeNumberFormatConverter}, 
+                    ConverterParameter=d2}"/>
                 <Run>:</Run>
-                <Run Text="{Binding LapSeconds}"/>
+                <Run Text="{Binding LapSeconds, Converter={StaticResource timeNumberFormatConverter}}"/>
                 </TextBlock>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="StartButton" Click="StartButton_Click">Start</Button>
-                <Button x:Name="StopButton"  Click="StopButton_Click">Stop</Button>
-                <Button x:Name="ResetButton" Click="ResetButton_Click">Reset</Button>
-                <Button x:Name="LapButton"   Click="LapButton_Click" Content="{StaticResource LapButtonText}"/>
+                <AppBarButton IsEnabled="{Binding Running, Converter={StaticResource notConverter}}" 
+                        x:Name="StartButton" Click="StartButton_Click" Icon="Play" Label="Start"/>
+                <AppBarButton IsEnabled="{Binding Running}" x:Name="StopButton" Icon="Stop" Label="Stop" 
+                        Click="StopButton_Click"/>
+                <AppBarButton x:Name="ResetButton" Icon="Refresh" Label="Reset" 
+                        Click="ResetButton_Click"/>
+                <AppBarButton IsEnabled="{Binding Running}" x:Name="LapButton" Icon="Add" 
+                              Label="{StaticResource LapButtonText}" Click="LapButton_Click" />
             </StackPanel>
+            <TextBlock Text="Stopwatch is working hard right now!" Visibility="{Binding Running,
+                Converter= {StaticResource visibilityConverter}}"/>
         </StackPanel>
     </Grid>
 </UserControl>

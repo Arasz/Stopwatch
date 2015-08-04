@@ -97,6 +97,7 @@ namespace Stopwatch.Model
             _previousElapsedTime = null;
             _started = null;
             LapTime = null;
+            OnLapTimeUpdated(LapTime);
         }
 
         /// <summary>

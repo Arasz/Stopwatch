@@ -31,14 +31,14 @@ namespace Stopwatch.ViewModel
         {
             get
             {
-                return Running ? _stopwatchModel.Elapsed.Value.Hours : 0;
+                return _stopwatchModel.Elapsed.HasValue ? _stopwatchModel.Elapsed.Value.Hours : 0;
             }
         }
         public int Minutes
         {
             get
             {
-                if (Running)
+                if (_stopwatchModel.Elapsed.HasValue)
                     return _stopwatchModel.Elapsed.Value.Minutes;
                 else
                     return 0;
@@ -48,7 +48,7 @@ namespace Stopwatch.ViewModel
         {
             get
             {
-                if (Running)
+                if (_stopwatchModel.Elapsed.HasValue)
                     return (decimal)_stopwatchModel.Elapsed.Value.Seconds+
                         (_stopwatchModel.Elapsed.Value.Milliseconds * .001M);
                 else
@@ -59,7 +59,7 @@ namespace Stopwatch.ViewModel
         {
             get
             {
-                if (Running)
+                if (_stopwatchModel.Elapsed.HasValue)
                     return _stopwatchModel.LapTime.Value.Hours;
                 else
                     return 0;
@@ -69,7 +69,7 @@ namespace Stopwatch.ViewModel
         {
             get
             {
-                if (Running)
+                if (_stopwatchModel.Elapsed.HasValue)
                     return _stopwatchModel.LapTime.Value.Minutes;
                 else
                     return 0;
@@ -79,7 +79,7 @@ namespace Stopwatch.ViewModel
         {
             get
             {
-                if (Running)
+                if (_stopwatchModel.Elapsed.HasValue)
                     return (decimal)_stopwatchModel.LapTime.Value.Seconds +
                         (_stopwatchModel.LapTime.Value.Milliseconds * .001M);
                 else
@@ -107,8 +107,7 @@ namespace Stopwatch.ViewModel
 
         public void Lap()
         {
-            if(Running)
-                _stopwatchModel.Lap();
+           _stopwatchModel.Lap();
         }
 
         public StopwatchViewModel()
@@ -148,9 +147,15 @@ namespace Stopwatch.ViewModel
         private int _lastHours;
         private int _lastMinutes;
         private decimal _lastSeconds;
+        private bool _lastRunning;
 
         private void _timer_Tick(object sender, object e)
         {
+            if(_lastRunning != Running)
+            {
+                _lastRunning = Running;
+                OnPropertyChanged("Running");
+            }
             if (_lastHours != Hours)
             {
                 _lastHours = Hours;
